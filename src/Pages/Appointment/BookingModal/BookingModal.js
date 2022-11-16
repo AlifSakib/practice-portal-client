@@ -3,9 +3,9 @@ import React, { useContext } from "react";
 import toast from "react-hot-toast";
 import { AuthContext } from "../../../contexts/AuthProvider";
 
-const BookingModal = ({ treatment, setTreatment, selectedDate }) => {
+const BookingModal = ({ treatment, setTreatment, selectedDate, refetch }) => {
   // treatment is just another name of appointmentOptions with name, slots, _id
-  const { name, slots } = treatment;
+  const { name: treatmentName, slots } = treatment;
   const date = format(selectedDate, "PP");
   const { user } = useContext(AuthContext);
 
@@ -19,7 +19,7 @@ const BookingModal = ({ treatment, setTreatment, selectedDate }) => {
     // [3, 4, 5].map((value, i) => console.log(value))
     const booking = {
       appointmentDate: date,
-      treatment: name,
+      treatment: treatmentName,
       patient: name,
       slot,
       email,
@@ -42,6 +42,7 @@ const BookingModal = ({ treatment, setTreatment, selectedDate }) => {
         setTreatment(null);
         console.log(data);
         toast.success("Booking Placed");
+        refetch();
       });
   };
 
@@ -56,7 +57,7 @@ const BookingModal = ({ treatment, setTreatment, selectedDate }) => {
           >
             ✕
           </label>
-          <h3 className="text-lg font-bold">{name}</h3>
+          <h3 className="text-lg font-bold">{treatmentName}</h3>
           <form
             onSubmit={handleBooking}
             className="grid grid-cols-1 gap-3 mt-10"
