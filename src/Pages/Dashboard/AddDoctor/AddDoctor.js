@@ -1,15 +1,51 @@
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { Navigate } from "react-router-dom";
 
 const AddDoctor = () => {
+  const { data: specialties, isLoading } = useQuery({
+    queryKey: ["specialty"],
+    queryFn: async () => {
+      const res = await fetch("http://localhost:5000/appointmentSpecialty");
+      const data = await res.json();
+      return data;
+    },
+  });
+
+  console.log(specialties);
+
   const handleAddDoctor = (data) => {
     console.log(data);
+    const doctor = {
+      name: data.name,
+      email: data.email,
+      specialty: data.specialty,
+    };
+    fetch("http://localhost:5000/adddoctor", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(doctor),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        toast.success("doctor added");
+        Navigate("/dashboard/managedoctors");
+      });
+
+    if (isLoading) {
+      return "Loading";
+    }
   };
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
   return (
     <div>
       <div className="h-[800px] flex justify-center items-center">
@@ -50,12 +86,18 @@ const AddDoctor = () => {
                 {" "}
                 <span className="label-text">Secialty</span>
               </label>
-              <select className="select select-bordered w-full max-w-xs">
+              <select
+                {...register("specialty")}
+                className="select select-bordered w-full max-w-xs"
+              >
                 <option disabled selected>
                   Select a spcialty
                 </option>
-                <option>Han Solo</option>
-                <option>Greedo</option>
+                {specialties.map((specialty) => (
+                  <option value={specialty.name} key={specialty._id}>
+                    {specialty.name}
+                  </option>
+                ))}
               </select>
             </div>
 
