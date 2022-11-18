@@ -14,6 +14,9 @@ const AllUsers = () => {
   const handleAdmion = (user) => {
     fetch(`http://localhost:5000/users/admin/${user._id}`, {
       method: "PUT",
+      headers: {
+        authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
     })
       .then((res) => res.json())
       .then((data) => {
